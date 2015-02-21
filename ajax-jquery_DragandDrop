@@ -1,0 +1,83 @@
+<!-- Sources:
+	http://stackoverflow.com/questions/19783077/javascript-keep-the-original-image-after-dropping-it-in-another-container
+	http://stackoverflow.com/questions/14113587/how-to-pass-data-from-a-draggable-item-to-a-connected-sortable-list 
+	 -->
+<!DOCTYPE HTML>
+<html>
+<head>
+	<script src="//code.jquery.com/jquery-1.8.3.min.js"></script>
+	<script>
+		$(document).ready(function() {
+		$tmp = $("#tmp").get(0);
+		
+		$("#sortable").sortable({
+			start: function(event, ui) {
+			},
+			stop: function(event, ui) { 
+				console.log("isNew : ", jQuery.data($tmp, "isNew"));
+				console.log("resultHTML : ", jQuery.data($tmp, "resultHTML"));
+			}
+		});
+
+		$("#draggable li").draggable({
+			connectToSortable: "#sortable",
+			start: function(event, ui) {    
+
+				//Store info in a tmp div         
+				jQuery.data($tmp, "isNew", true);
+				jQuery.data($tmp, "resultHTML", "<b>Here I will add some custom html to EVENT data</b>");
+				
+			},
+			helper: function(event) {
+				return "<div class='custom-helper'>Custom helper for " + $(this).context.innerHTML + "</div>";   
+			},
+			revert: "invalid"
+		});
+	});
+	</script>
+	<style>
+		#div1 {width:190px;height:290px;padding:10px;border:1px solid #aaaaaa;}
+		li {
+			margin: 5px;
+			padding: 5px;
+			width: 150px;
+		}
+
+		#sortable {
+			margin-top: 16px;
+			min-height: 256px;
+		}
+	</style>
+	<script type="text/JavaScript">
+		function allowDrop(ev) {
+			ev.preventDefault();
+		}
+
+		function drag(ev) {
+			ev.dataTransfer.setData("text", ev.target.id);
+		}
+
+		function drop(ev) {
+			ev.preventDefault();
+			var data = ev.dataTransfer.getData("text");
+			ev.target.appendChild(document.getElementById(data).cloneNode(true));
+			
+		}
+	</script>
+</head>
+<body>
+
+	<p>Drag the book into the Cart:</p>
+
+	<div id="div1" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+	<br>
+	<ul id="draggable">
+		<li class="ui-state-default"><img id="drag1" src="book1.png" draggable="true" ondragstart="drag(event)" width="190" height="290"></li>
+		<li class="ui-state-default"><img id="drag2" src="book2.png" draggable="true" ondragstart="drag(event)" width="190" height="290"></li>
+		<li class="ui-state-default"><img id="drag3" src="book3.png" draggable="true" ondragstart="drag(event)" width="190" height="290"></li>
+	</ul>
+	<ul id="sortable" class="ui-state-highlight">
+	</ul>
+	<div id="tmp"></div>
+</body>
+</html>
